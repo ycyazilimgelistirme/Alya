@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Seni Çok Seviyorum ❤️</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@300;400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ==========================================
+         * GENEL AYARLAR & VARYABLLER
+         * ========================================== */
+        :root {
+            --primary-color: #ff3366;
+            --secondary-color: #ff8fa3;
+            --bg-gradient: linear-gradient(135deg, #fff0f3 0%, #ffe3e8 100%);
+            --text-color: #4a0e1c;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --shadow: 0 10px 40px rgba(255, 51, 102, 0.15);
+            --shadow-hover: 0 15px 50px rgba(255, 51, 102, 0.25);
+            --border-radius: 24px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            overflow: hidden; 
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            overscroll-behavior: none;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* ==========================================
+         * ARKA PLAN EFEKTLERİ
+         * ========================================== */
+        .bg-hearts {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; pointer-events: none;
+        }
+        .heart-bg {
+            position: absolute; color: var(--secondary-color); opacity: 0.2;
+            animation: floatUp linear infinite;
+            filter: drop-shadow(0 0 5px rgba(255, 143, 163, 0.5));
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.4; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-10vh) scale(1.5) rotate(45deg); opacity: 0; }
+        }
+
+        /* ==========================================
+         * YÜKLEME EKRANI
+         * ========================================== */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff0f3; z-index: 9999;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .heart-beat { 
+            font-size: 6rem; color: var(--primary-color); 
+            animation: heartbeat 1s infinite alternate; 
+            filter: drop-shadow(0 0 20px rgba(255, 51, 102, 0.4));
+        }
+        .loading-text { 
+            margin-top: 25px; font-family: 'Pacifico', cursive; 
+            font-size: 1.8rem; color: var(--primary-color); 
+            letter-spacing: 1px;
+        }
+        @keyframes heartbeat { 
+            0% { transform: scale(1); } 
+            100% { transform: scale(1.15); } 
+        }
+
+        /* ==========================================
+         * MÜZİK ÇALAR
+         * ========================================== */
+        .music-player {
+            position: fixed; top: 20px; right: 20px; 
+            padding: 8px 16px; border-radius: 50px; 
+            display: flex; align-items: center; gap: 12px; 
+            z-index: 2000; transition: all 0.3s;
+            cursor: pointer;
+        }
+        .music-player:hover { transform: scale(1.05); }
+        .play-btn {
+            width: 36px; height: 36px; border-radius: 50%; 
+            background: var(--primary-color); color: white; 
+            border: none; cursor: pointer; display: flex; 
+            justify-content: center; align-items: center;
+            font-size: 14px; box-shadow: 0 4px 10px rgba(255,51,102,0.3);
+        }
+        .visualizer { display: flex; gap: 4px; height: 16px; align-items: flex-end; }
+        .bar { width: 4px; background: var(--primary-color); border-radius: 2px; animation: equalize 1s infinite; }
+        .bar:nth-child(2) { animation-delay: 0.2s; }
+        .bar:nth-child(3) { animation-delay: 0.4s; }
+        .paused .bar { animation-play-state: paused; height: 4px !important; }
+        @keyframes equalize { 0%, 100% { height: 4px; } 50% { height: 16px; } }
+
+        /* ==========================================
+         * NAVİGASYON (MASAÜSTÜ)
+         * ========================================== */
+        nav {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000;
+        }
+        .logo { font-family: 'Pacifico', cursive; font-size: 1.8rem; color: var(--primary-color); text-decoration: none; }
+        .nav-links { display: flex; gap: 30px; list-style: none; }
+        .nav-links li button {
+            background: none; border: none; font-size: 1.1rem; font-weight: 600;
+            color: var(--text-color); cursor: pointer; transition: all 0.3s;
+            font-family: 'Nunito', sans-serif; padding: 5px 10px; border-radius: 10px;
+        }
+        .nav-links li button:hover, .nav-links li button.active { 
+            color: var(--primary-color); background: rgba(255, 51, 102, 0.1); 
+        }
+
+        /* ==========================================
+         * SAYFA YAPISI
+         * ========================================== */
+        .page-section {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 90px 20px 40px 20px; 
+            opacity: 0; visibility: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(0.95) translateY(20px);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            overflow-y: auto; overflow-x: hidden;
+        }
+
+        .page-section.active-section {
+            opacity: 1; visibility: visible;
+            transform: scale(1) translateY(0); z-index: 10;
+        }
+
+        /* ==========================================
+         * BUTONLAR (İLERİ/GERİ)
+         * ========================================== */
+        .page-nav-btns { 
+            margin-top: 40px; 
+            display: flex; 
+            gap: 15px; 
+            z-index: 100; 
+            flex-wrap: wrap; 
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .btn-nav {
+            padding: 12px 30px; border: none; border-radius: 50px;
+            background: var(--white); color: var(--text-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            font-size: 1.1rem; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 10px; font-weight: 700;
+            font-family: 'Nunito', sans-serif;
+        }
+        .btn-nav:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
+        
+        .btn-nav.primary { background: var(--primary-color); color: white; box-shadow: 0 6px 20px rgba(255, 51, 102, 0.3); }
+        .btn-nav.primary:hover { background: #e62e5c; box-shadow: 0 8px 25px rgba(255, 51, 102, 0.4); }
+
+        /* ==========================================
+         * BÖLÜM 1: GİRİŞ
+         * ========================================== */
+        .hero-container { text-align: center; max-width: 800px; width: 100%; }
+        h1 { font-family: 'Dancing Script', cursive; font-size: 5rem; color: var(--primary-color); margin-bottom: 10px; line-height: 1.2; text-shadow: 2px 2px 4px rgba(255,51,102,0.1); }
+        .subtitle { font-size: 1.5rem; color: var(--text-color); margin-bottom: 40px; font-weight: 300; }
+        
+        .hero-img-container {
+            width: 260px; height: 260px; border-radius: 50%; 
+            border: 8px solid var(--white); box-shadow: var(--shadow); 
+            overflow: hidden; margin: 0 auto 30px; position: relative;
+        }
+        .hero-img-container::before {
+            content: ''; position: absolute; top: -8px; left: -8px; right: -8px; bottom: -8px;
+            border-radius: 50%; border: 2px solid var(--primary-color);
+            animation: pulse-border 2s infinite; z-index: -1;
+        }
+        .hero-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        @keyframes pulse-border { 
+            0% { transform: scale(1); opacity: 0.8; } 
+            100% { transform: scale(1.15); opacity: 0; } 
+        }
+
+        /* ==========================================
+         * BÖLÜM 2: SAYAÇ
+         * ========================================== */
+        .timer-card { padding: 40px; text-align: center; max-width: 800px; width: 100%; margin: auto; }
+        .timer-card h2 { font-family: 'Pacifico', cursive; font-size: 2.5rem; color: var(--primary-color); margin-bottom: 30px; }
+        .timer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        
+        .time-box { 
+            background: rgba(255, 255, 255, 0.8); padding: 20px 10px; 
+            border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            transition: transform 0.3s; display: flex; flex-direction: column; align-items: center;
+        }
+        .time-box:hover { transform: translateY(-5px); }
+        .time-value { font-size: 2.5rem; font-weight: 800; color: var(--primary-color); line-height: 1; margin-bottom: 5px; }
+        .time-label { font-size: 0.9rem; text-transform: uppercase; color: #777; font-weight: 600; letter-spacing: 1px; }
+
+        /* ==========================================
+         * BÖLÜM 3: NEDEN SEN
+         * ========================================== */
+        .reasons-header { font-family: 'Pacifico', cursive; font-size: 2.5rem; color: var(--primary-color); margin-bottom: 40px; text-align: center; }
+        .cards-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; max-width: 1000px; width: 100%; }
+        
+        .love-card {
+            background: var(--white); width: calc(33.333% - 20px); min-width: 260px; 
+            padding: 35px 25px; border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04); text-align: center;
+            border-bottom: 5px solid transparent; transition: all 0.4s ease;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .love-card:hover { transform: translateY(-10px); border-bottom-color: var(--primary-color); box-shadow: var(--shadow-hover); }
+        .card-icon-wrapper {
+            width: 80px; height: 80px; border-radius: 50%; background: var(--bg-gradient);
+            display: flex; justify-content: center; align-items: center; margin-bottom: 20px;
+        }
+        .card-icon { font-size: 2.2rem; color: var(--primary-color); }
+        .love-card h3 { font-size: 1.4rem; margin-bottom: 15px; color: var(--text-color); }
+        .love-card p { font-size: 1.05rem; color: #666; line-height: 1.6; }
+
+        /* ==========================================
+         * BÖLÜM 4: OYUN
+         * ========================================== */
+        .game-wrapper { padding: 30px; text-align: center; width: 100%; max-width: 700px; margin: auto; }
+        .game-wrapper h2 { font-family: 'Pacifico', cursive; font-size: 2.5rem; color: var(--primary-color); margin-bottom: 15px; }
+        .score-board { font-size: 1.8rem; color: var(--text-color); font-weight: bold; margin-bottom: 20px; }
+        .score-board span { color: var(--primary-color); font-size: 2rem; }
+        
+        .canvas-container {
+            width: 100%; overflow: hidden; border-radius: 20px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+            background: rgba(255, 255, 255, 0.5);
+            border: 3px dashed var(--secondary-color);
+            position: relative;
+        }
+        canvas { display: block; width: 100%; cursor: none; touch-action: none; }
+
+        /* ==========================================
+         * BÖLÜM 5: MEKTUP
+         * ========================================== */
+        .letter-container {
+            max-width: 650px; width: 100%; margin: auto; padding: 50px 40px;
+            background: #fff; background-image: radial-gradient(#ffe3e8 1px, transparent 1px);
+            background-size: 20px 20px; border-radius: 8px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08); position: relative;
+            transform: rotate(-1deg);
+        }
+        .letter-container::before {
+            content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 30px; background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transform: translateX(-50%) rotate(2deg);
+        }
+        .letter-content { font-family: 'Dancing Script', cursive; font-size: 2rem; color: #333; line-height: 1.8; min-height: 200px; text-align: left; }
+        .cursor { display: inline-block; width: 3px; height: 25px; background: var(--primary-color); animation: blink 1s infinite; vertical-align: middle; }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        .letter-footer { text-align: right; margin-top: 30px; font-family: 'Pacifico', cursive; font-size: 1.5rem; color: var(--primary-color); opacity: 0; transition: opacity 1s; }
+        .letter-footer.show { opacity: 1; }
+
+        /* ==========================================
+         * MOBİL UYARLAMA (RESPONSIVE)
+         * ========================================== */
+        @media (max-width: 768px) {
+            /* Üst Menüyü Gizle */
+            nav { display: none; }
+            
+            /* Sayfa İçerik Boşlukları (Sadece butonlar için alt boşluk) */
+            .page-section { padding: 80px 15px 40px 15px; justify-content: flex-start; }
+            
+            /* Tipografi ve Boyutlar */
+            h1 { font-size: 3.5rem; }
+            .subtitle { font-size: 1.2rem; margin-bottom: 25px; }
+            .hero-img-container { width: 200px; height: 200px; border-width: 5px; }
+            
+            /* Müzik Çalar Pozisyonu */
+            .music-player { top: 15px; right: 15px; padding: 6px 12px; background: var(--glass-bg); backdrop-filter: blur(10px); }
+            
+            /* Sayaç - 2 Sütun */
+            .timer-card { padding: 25px 15px; }
+            .timer-card h2 { font-size: 2rem; }
+            .timer-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .time-value { font-size: 2rem; }
+            
+            /* Neden Sen Kartları - Dikey sıralı */
+            .love-card { width: 100%; padding: 25px 20px; }
+            .reasons-header { font-size: 2.2rem; margin-bottom: 25px; }
+            
+            /* Oyun Alanı */
+            .game-wrapper { padding: 20px 10px; }
+            .game-wrapper h2 { font-size: 2rem; }
+            
+            /* Mektup Alanı */
+            .letter-container { padding: 30px 20px; transform: rotate(0); }
+            .letter-content { font-size: 1.6rem; min-height: 250px; }
+            
+            /* Butonlar mobilde yan yana sıkışmasın diye biraz küçültelim */
+            .btn-nav { padding: 12px 20px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Yükleme Ekranı -->
+    <div id="loader">
+        <i class="fas fa-heart heart-beat"></i>
+        <div class="loading-text">Aşkımız Yükleniyor...</div>
+    </div>
+
+    <!-- Uçuşan Kalpler Arka Planı -->
+    <div class="bg-hearts" id="bg-hearts"></div>
+
+    <!-- Müzik Çalar (Dosya adı: music.mp4a) -->
+    <div class="music-player glass-panel paused" id="music-player" onclick="toggleMusic()">
+        <button class="play-btn" id="play-btn"><i class="fas fa-play"></i></button>
+        <div class="visualizer" id="visualizer">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+        <audio id="bg-audio" loop>
+            <source src="music.m4a" type="audio/mp4">
+            <source src="music.m4a" type="audio/aac">
+            Tarayıcınız ses öğesini desteklemiyor.
+        </audio>
+    </div>
+
+    <!-- Masaüstü Üst Menü -->
+    <nav>
+        <a href="#" class="logo">Alyam ❤️</a>
+        <ul class="nav-links">
+            <li><button onclick="goToPage(0)" class="nav-dot active">Başlangıç</button></li>
+            <li><button onclick="goToPage(1)" class="nav-dot">Zaman</button></li>
+            <li><button onclick="goToPage(2)" class="nav-dot">Neden Sen?</button></li>
+            <li><button onclick="goToPage(3)" class="nav-dot">Oyun</button></li>
+            <li><button onclick="goToPage(4)" class="nav-dot">Mektup</button></li>
+        </ul>
+    </nav>
+
+    <!-- SAYFA 1: GİRİŞ -->
+    <div class="page-section active-section" id="page-0">
+        <div class="hero-container">
+            <div class="hero-img-container">
+                <!-- Fotoğraf (photo1.jpg) -->
+                <img src="photo1.jpg" alt="İkimiz" onerror="this.src='https://images.unsplash.com/photo-1518568814500-bf0f8d125f46?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80';">
+            </div>
+            <h1>Seni çok seviyorum<br>Alya</h1>
+            <p class="subtitle">Sen varken her şey daha güzel</p>
+            
+            <div class="page-nav-btns">
+                <button class="btn-nav primary" onclick="startExperience()">
+                    Başla <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAYFA 2: SAYAÇ -->
+    <div class="page-section" id="page-1">
+        <div class="timer-card glass-panel">
+            <h2>Bizim Zamanımız</h2>
+            <div class="timer-grid">
+                <div class="time-box"><span class="time-value" id="years">0</span><span class="time-label">Yıl</span></div>
+                <div class="time-box"><span class="time-value" id="months">0</span><span class="time-label">Ay</span></div>
+                <div class="time-box"><span class="time-value" id="days">0</span><span class="time-label">Gün</span></div>
+                <div class="time-box"><span class="time-value" id="hours">0</span><span class="time-label">Saat</span></div>
+                <div class="time-box"><span class="time-value" id="minutes">0</span><span class="time-label">Dakika</span></div>
+                <div class="time-box"><span class="time-value" id="seconds">0</span><span class="time-label">Saniye</span></div>
+            </div>
+        </div>
+        <div class="page-nav-btns">
+            <button class="btn-nav" onclick="prevPage()"><i class="fas fa-arrow-left"></i> Geri</button>
+            <button class="btn-nav primary" onclick="nextPage()">İleri <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- SAYFA 3: NEDEN SEN -->
+    <div class="page-section" id="page-2">
+        <div style="width: 100%; max-width: 1000px; text-align: center;">
+            <h2 class="reasons-header">Seni Neden Seviyorum?</h2>
+            <div class="cards-container">
+                <div class="love-card glass-panel">
+                    <div class="card-icon-wrapper"><i class="fas fa-smile-beam card-icon"></i></div>
+                    <h3>Gülüşün</h3>
+                    <p>En karanlık günlerimi aydınlatan o eşsiz ışığın, içimi ısıtan tebessümün için.</p>
+                </div>
+                <div class="love-card glass-panel">
+                    <div class="card-icon-wrapper"><i class="fas fa-hand-holding-heart card-icon"></i></div>
+                    <h3>Kalbin</h3>
+                    <p>Sonsuz şefkatinle, her koşulda bana en güvenli liman olduğun için.</p>
+                </div>
+                <div class="love-card glass-panel">
+                    <div class="card-icon-wrapper"><i class="fas fa-star card-icon"></i></div>
+                    <h3>Varlığın</h3>
+                    <p>Hayatımı sıradanlıktan kurtarıp, her günü bir masala çevirdiğin için.</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-nav-btns">
+            <button class="btn-nav" onclick="prevPage()"><i class="fas fa-arrow-left"></i> Geri</button>
+            <button class="btn-nav primary" onclick="nextPage()">İleri <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- SAYFA 4: OYUN -->
+    <div class="page-section" id="page-3">
+        <div class="game-wrapper glass-panel">
+            <h2>Aşkını Yakala!</h2>
+            <p style="margin-bottom: 15px; color: #666;">Düşen kalpleri sepetle topla ❤️</p>
+            <div class="score-board">Skor: <span id="score">0</span></div>
+            
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="600" height="300"></canvas>
+            </div>
+            
+            <br>
+            <button class="btn-nav primary" style="margin: 15px auto 0;" onclick="startGame()" id="start-btn">Oyuna Başla</button>
+        </div>
+        <div class="page-nav-btns">
+            <button class="btn-nav" onclick="prevPage()"><i class="fas fa-arrow-left"></i> Geri</button>
+            <button class="btn-nav primary" onclick="nextPage()">İleri <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <!-- SAYFA 5: MEKTUP -->
+    <div class="page-section" id="page-4">
+        <div class="letter-container">
+            <div class="letter-content">
+                <span id="typing-text"></span><span class="cursor"></span>
+            </div>
+            <div class="letter-footer" id="letter-footer">
+                Sonsuza dek seninle... ❤️<br>
+                <span style="font-size: 1rem; color: #666; font-family: 'Nunito', sans-serif;">Yusuf</span>
+            </div>
+        </div>
+        <div class="page-nav-btns">
+            <button class="btn-nav" onclick="prevPage()"><i class="fas fa-arrow-left"></i> Geri</button>
+            <button class="btn-nav primary" onclick="goToPage(0)">Başa Dön <i class="fas fa-redo"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // SİSTEM DEĞİŞKENLERİ
+        // ==========================================
+        const startDate = new Date(2026, 1, 24, 18, 30); // Tanışma tarihi (Ay: 0=Ocak, 1=Şubat)
+        let currentPage = 0;
+        const totalPages = 5;
+
+        // ==========================================
+        // SAYFA YÜKLEME EFEKTİ
+        // ==========================================
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+                setTimeout(() => loader.remove(), 800);
+            }, 1200);
+        });
+
+        // ==========================================
+        // ARKA PLAN KALP EFEKTİ
+        // ==========================================
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart-bg');
+            heart.innerHTML = '<i class="fas fa-heart"></i>';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 4 + 's';
+            heart.style.fontSize = Math.random() * 15 + 10 + 'px';
+            document.getElementById('bg-hearts').appendChild(heart);
+            setTimeout(() => heart.remove(), 7000);
+        }
+        setInterval(createHeart, 500);
+
+        // ==========================================
+        // MÜZİK KONTROLÜ
+        // ==========================================
+        const audio = document.getElementById('bg-audio');
+        const playBtn = document.getElementById('play-btn');
+        const musicPlayer = document.getElementById('music-player');
+
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    musicPlayer.classList.remove('paused');
+                    playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                }).catch(err => console.log("Otomatik oynatma engellendi.", err));
+            } else {
+                audio.pause();
+                musicPlayer.classList.add('paused');
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        }
+
+        function startExperience() {
+            // İlk etkileşimde müziği başlat
+            if (audio.paused) toggleMusic();
+            nextPage();
+        }
+
+        // ==========================================
+        // SAYFA GEÇİŞ VE NAVİGASYON
+        // ==========================================
+        function updateUI() {
+            // Sayfaları ayarla
+            document.querySelectorAll('.page-section').forEach((page, index) => {
+                if (index === currentPage) {
+                    page.classList.add('active-section');
+                    page.scrollTop = 0; // Yeni sayfaya geçince en üste kaydır
+                } else {
+                    page.classList.remove('active-section');
+                }
+            });
+
+            // Masaüstü Menü Güncelleme
+            document.querySelectorAll('.nav-dot').forEach((btn, index) => {
+                btn.classList.toggle('active', index === currentPage);
+            });
+
+            // Mektup sayfasına gelince daktilo efektini başlat
+            if (currentPage === 4 && !typingStarted) {
+                setTimeout(startTyping, 500);
+            }
+            
+            // Oyun sayfasına gelince canvas'ı doğru boyutlandır
+            if (currentPage === 3) {
+                resizeCanvas();
+            }
+        }
+
+        function nextPage() { if (currentPage < totalPages - 1) { currentPage++; updateUI(); } }
+        function prevPage() { if (currentPage > 0) { currentPage--; updateUI(); } }
+        function goToPage(index) { currentPage = index; updateUI(); }
+
+        // ==========================================
+        // SAYAÇ (BİRLİKTELİK SÜRESİ)
+        // ==========================================
+        function updateTimer() {
+            const now = new Date();
+            const diff = now - startDate;
+            
+            const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+            const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24));
+            const months = Math.floor(days / 30);
+            const remainingDays = days % 30;
+            
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('years').innerText = years;
+            document.getElementById('months').innerText = months;
+            document.getElementById('days').innerText = remainingDays; 
+            document.getElementById('hours').innerText = hours;
+            document.getElementById('minutes').innerText = minutes;
+            document.getElementById('seconds').innerText = seconds;
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // ==========================================
+        // MEKTUP DAKTİLO EFEKTİ
+        // ==========================================
+        const letterText = "Sevgilim,\n\nHayatıma girdiğin ilk günden beri dünyamın renkleri değişti. Seninle gülmek, seninle dertleşmek ve gözlerine bakarak hayaller kurmak başıma gelen en güzel şey.\n\nİyi ki varsın, iyi ki benimsin. Seni her şeyden ve herkesten çok seviyorum...";
+        let charIndex = 0;
+        let typingStarted = false;
+
+        function startTyping() {
+            typingStarted = true;
+            const textElement = document.getElementById('typing-text');
+            textElement.innerHTML = "";
+            charIndex = 0;
+            typeNextChar();
+        }
+
+        function typeNextChar() {
+            if (charIndex < letterText.length) {
+                const textElement = document.getElementById('typing-text');
+                let char = letterText.charAt(charIndex);
+                if (char === '\n') {
+                    textElement.innerHTML += '<br>';
+                } else {
+                    textElement.innerHTML += char;
+                }
+                charIndex++;
+                setTimeout(typeNextChar, 60);
+            } else {
+                document.getElementById('letter-footer').classList.add('show');
+                document.querySelector('.cursor').style.display = 'none';
+            }
+        }
+
+        // ==========================================
+        // OYUN - RESPONSIVE & DOKUNMATİK DESTEKLİ
+        // ==========================================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let gameActive = false;
+        let score = 0;
+        let animationId;
+        
+        let basket = { x: 0, width: 80, height: 15 };
+        let gameHearts = [];
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            basket.x = (canvas.width / 2) - (basket.width / 2);
+            drawInitialState();
+        }
+        window.addEventListener('resize', () => {
+            if(currentPage === 3) resizeCanvas();
+        });
+
+        function updateBasketPos(clientX) {
+            const rect = canvas.getBoundingClientRect();
+            let newX = clientX - rect.left - (basket.width / 2);
+            if (newX < 0) newX = 0;
+            if (newX + basket.width > canvas.width) newX = canvas.width - basket.width;
+            basket.x = newX;
+        }
+
+        canvas.addEventListener('mousemove', e => { if(gameActive) updateBasketPos(e.clientX); });
+        canvas.addEventListener('touchmove', e => { 
+            e.preventDefault(); 
+            if(gameActive) updateBasketPos(e.touches[0].clientX); 
+        }, {passive: false});
+
+        function drawInitialState() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff3366';
+            ctx.fillRect(basket.x, canvas.height - basket.height - 10, basket.width, basket.height);
+            ctx.beginPath(); 
+            ctx.arc(basket.x + basket.width/2, canvas.height - basket.height - 10, basket.width/2, 0, Math.PI, true); 
+            ctx.fill();
+        }
+
+        function startGame() {
+            if(gameActive) return;
+            gameActive = true; 
+            score = 0; 
+            gameHearts = [];
+            document.getElementById('score').innerText = score;
+            document.getElementById('start-btn').style.display = 'none';
+            resizeCanvas();
+            gameLoop();
+        }
+
+        function gameLoop() {
+            if(!gameActive) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if(Math.random() < 0.04) {
+                const size = Math.random() * 15 + 15;
+                gameHearts.push({ 
+                    x: Math.random() * (canvas.width - size), 
+                    y: -30, 
+                    speed: 2 + Math.random() * 3,
+                    size: size
+                });
+            }
+
+            ctx.fillStyle = '#ff3366';
+            const basketY = canvas.height - basket.height - 10;
+            ctx.fillRect(basket.x, basketY, basket.width, basket.height);
+            ctx.beginPath(); 
+            ctx.arc(basket.x + basket.width/2, basketY, basket.width/2, 0, Math.PI, true); 
+            ctx.fill();
+
+            for (let i = gameHearts.length - 1; i >= 0; i--) {
+                let h = gameHearts[i];
+                h.y += h.speed;
+                
+                ctx.font = `${h.size}px Arial`; 
+                ctx.fillText("❤️", h.x, h.y);
+                
+                if (h.y + h.size > basketY && h.y < canvas.height && 
+                    h.x + h.size > basket.x && h.x < basket.x + basket.width) {
+                    score += 10; 
+                    document.getElementById('score').innerText = score;
+                    gameHearts.splice(i, 1);
+                    continue;
+                }
+                
+                if (h.y > canvas.height + 30) {
+                    gameHearts.splice(i, 1);
+                }
+            }
+            
+            animationId = requestAnimationFrame(gameLoop);
+        }
+        
+        setTimeout(resizeCanvas, 500);
+
+    </script>
+</body>
+</html>
